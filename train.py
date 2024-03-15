@@ -41,7 +41,7 @@ def main():
     wandb.init(
         project="tinylinguist",
         entity="broccoliman",
-        name="main_run",
+        name="main_run_2",
     )
 
     tokenized, tokenizer = prepare_data_tokenizer()
