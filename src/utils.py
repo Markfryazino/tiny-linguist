@@ -2,8 +2,7 @@ from datasets import Dataset, DatasetDict
 
 import os
 
-def load_data(path: str) -> DatasetDict:
-    splits = ["train", "valid"]
+def load_data(path: str, splits = ["train", "valid"]) -> DatasetDict:
     data = {}
     for split in splits:
         with open(os.path.join(path, f"TinyStoriesV2-GPT4-{split}.txt"), "r") as f:
