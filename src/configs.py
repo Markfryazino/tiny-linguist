@@ -1,5 +1,6 @@
 from transformers import LlamaConfig, TrainingArguments
 
+import os
 
 MODEL_CONFIG = LlamaConfig(
     vocab_size=50257,
@@ -14,7 +15,7 @@ MODEL_CONFIG = LlamaConfig(
 
 
 TRAINING_ARGS = TrainingArguments(
-    output_dir="/proj/mechanistic.shadow/mrofin/tinylinguist/models",
+    output_dir=os.path.join(os.getenv("DATA_PATH"), "models"),
     evaluation_strategy="steps",
     per_device_train_batch_size=128,
     per_device_eval_batch_size=128,

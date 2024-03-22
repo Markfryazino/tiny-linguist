@@ -18,7 +18,7 @@ filterwarnings(category=ConvergenceWarning, action="ignore")
 
 
 def main():
-    checkpoints = os.listdir("/proj/mechanistic.shadow/mrofin/tinylinguist/models/")
+    checkpoints = os.listdir(os.path.join(os.getenv("DATA_PATH"), "models"))
 
     data = []
 
@@ -29,12 +29,12 @@ def main():
                     step=int(path.split("-")[1]),
                     layer=layer,
                     **{
-                        k: torch.load(os.path.join("/proj/mechanistic.shadow/mrofin/tinylinguist/models/", path, k + f"_representations_2_layer_{layer}.pt"))
+                        k: torch.load(os.path.join(os.getenv("DATA_PATH"), "models", path, k + f"_representations_2_layer_{layer}.pt"))
                         for k in ["tc_train", "tc_test", "dl_train", "dl_test"]
                     }
                 ))
 
-    labels = DatasetDict.load_from_disk("/proj/mechanistic.shadow/mrofin/tinylinguist/data/val_linguistic_features_2/")
+    labels = DatasetDict.load_from_disk(os.path.join(os.getenv("DATA_PATH"), "data/val_linguistic_features_2/"))
 
     tc_encoder = LabelEncoder()
 
@@ -73,7 +73,7 @@ def main():
             sl_mse=mean_squared_error(sl_y_test, sl_pred)
         ))
  
-    with open("/proj/mechanistic.shadow/mrofin/tinylinguist/data/val_results_2.json", "w") as f:
+    with open(os.path.join(os.getenv("DATA_PATH"), "data/val_results_2.json"), "w") as f:
         json.dump(results, f)
 
 

@@ -8,6 +8,7 @@ import wandb
 import torch
 import numpy as np
 import random
+import os
 
 def tokenize(example, tokenizer):
     return tokenizer(example["text"], truncation=True, max_length=256)
@@ -22,7 +23,7 @@ def set_random_seed(seed, verbose=True):
 
 
 def prepare_data_tokenizer():
-    data = load_data("/proj/mechanistic.shadow/mrofin/tinylinguist/data")
+    data = load_data(os.path.join(os.getenv("DATA_PATH"), "data"))
 
     tokenizer = AutoTokenizer.from_pretrained("gpt2")
     tokenize_fn = partial(tokenize, tokenizer=tokenizer)
@@ -48,7 +49,7 @@ def main():
     
     model = LlamaForCausalLM(MODEL_CONFIG)
 
-    model.save_pretrained("/proj/mechanistic.shadow/mrofin/tinylinguist/models/checkpoint-0")
+    model.save_pretrained(os.path.join(os.getenv("DATA_PATH"), "models/checkpoint-0"))
 
     trainer = Trainer(
         model=model,

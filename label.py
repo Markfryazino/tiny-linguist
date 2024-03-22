@@ -3,14 +3,15 @@ from src.utils import load_data
 from tqdm import tqdm
 
 import benepar, spacy
+import os
 import pandas as pd
 
 
 def label():
     nlp_pipeline = spacy.load('en_core_web_md')
-    nlp_pipeline.add_pipe("benepar", config={"model": "/proj/mechanistic.shadow/mrofin/tinylinguist/models/benepar_en3"})
+    nlp_pipeline.add_pipe("benepar", config={"model": os.path.join(os.getenv("DATA_PATH"), "models/benepar_en3")})
 
-    data = load_data("/proj/mechanistic.shadow/mrofin/tinylinguist/data")
+    data = load_data(os.path.join(os.getenv("DATA_PATH"), "data"))
 
     sentences = []
     bad_parses = 0
@@ -28,7 +29,7 @@ def label():
     print(f"Total bad parses: {bad_parses}")
 
     pd_data = pd.DataFrame(sentences)
-    pd_data.to_csv("/proj/mechanistic.shadow/mrofin/tinylinguist/data/valid_sentences.csv", index=False, sep="\t")
+    pd_data.to_csv(os.path.join(os.getenv("DATA_PATH"), "data/valid_sentences.csv"), index=False, sep="\t")
 
 
 if __name__ == "__main__":
