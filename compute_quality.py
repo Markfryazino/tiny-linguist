@@ -24,15 +24,17 @@ def main():
 
     for path in tqdm(checkpoints):
         if path.startswith("checkpoint"):
-            data.append(dict(
-                step=int(path.split("-")[1]),
-                **{
-                    k: torch.load(os.path.join("/proj/mechanistic.shadow/mrofin/tinylinguist/models/", path, k + "_representations.pt"))
-                    for k in ["tc_train", "tc_test", "dl_train", "dl_test"]
-                }
-            ))
+            for layer in [2, 4, 6, 8]:
+                data.append(dict(
+                    step=int(path.split("-")[1]),
+                    layer=layer,
+                    **{
+                        k: torch.load(os.path.join("/proj/mechanistic.shadow/mrofin/tinylinguist/models/", path, k + f"_representations_2_layer_{layer}.pt"))
+                        for k in ["tc_train", "tc_test", "dl_train", "dl_test"]
+                    }
+                ))
 
-    labels = DatasetDict.load_from_disk("/proj/mechanistic.shadow/mrofin/tinylinguist/data/val_linguistic_features/")
+    labels = DatasetDict.load_from_disk("/proj/mechanistic.shadow/mrofin/tinylinguist/data/val_linguistic_features_2/")
 
     tc_encoder = LabelEncoder()
 
@@ -65,12 +67,13 @@ def main():
 
         results.append(dict(
             step=current_preds["step"],
+            layer=current_preds["layer"],
             tc_acc=accuracy_score(tc_y_test, tc_pred),
             td_mse=mean_squared_error(td_y_test, td_pred),
             sl_mse=mean_squared_error(sl_y_test, sl_pred)
         ))
  
-    with open("/proj/mechanistic.shadow/mrofin/tinylinguist/data/val_results.json", "w") as f:
+    with open("/proj/mechanistic.shadow/mrofin/tinylinguist/data/val_results_2.json", "w") as f:
         json.dump(results, f)
 
 

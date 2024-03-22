@@ -20,10 +20,15 @@ from transformers.modeling_outputs import BaseModelOutputWithPast
 
 class LlamaPredictor(LlamaModel):
     def forward(self, input_ids, attention_mask):
-        model_pred = super().forward(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state
+        states = super().forward(
+            input_ids=input_ids, attention_mask=attention_mask, output_hidden_states=True
+        ).hidden_states
         last_non_pad_idx = attention_mask.sum(1).long() - 1
         return BaseModelOutputWithPast(
-            last_hidden_state=model_pred[torch.arange(model_pred.size(0)), last_non_pad_idx].unsqueeze(1)
+            hidden_states=tuple([
+                model_pred[torch.arange(model_pred.size(0)), last_non_pad_idx].unsqueeze(1)
+                for model_pred in states
+            ])
         )
 
 def tokenize(example, tokenizer):
@@ -78,7 +83,8 @@ def pipeline(data_path, model_path):
         )
 
         prediction = trainer.predict(data_split.select_columns(["input_ids", "attention_mask"])).predictions
-        torch.save(prediction.squeeze(1), os.path.join(model_path, f"{key}_representations.pt"))
+        for i in [2, 4, 6, 8]:
+            torch.save(prediction[i].squeeze(1), os.path.join(model_path, f"{key}_representations_2_layer_{i}.pt"))
 
 
 
